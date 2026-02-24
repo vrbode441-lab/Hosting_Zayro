@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alord Hosting</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Share+Tech+Mono&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--c:#00f5ff;--p:#bf00ff;--g:#00ff88;--r:#ff3366;--y:#ffcc00;--bg:#060810;--pn:#0a0d1a;--cd:#0d1020;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow-x:hidden;}
+body{background:var(--bg);color:#c8e8f0;font-family:'Tajawal',sans-serif;min-height:100vh;direction:rtl;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,245,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+.scan{position:fixed;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);opacity:.2;pointer-events:none;z-index:999;animation:sc 9s linear infinite;}
+@keyframes sc{0%{top:-2px}100%{top:100vh}}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;animation:ob 10s ease-in-out infinite;}
+.o1{width:500px;height:500px;background:rgba(0,245,255,.05);top:-150px;right:-150px;}
+.o2{width:400px;height:400px;background:rgba(191,0,255,.05);bottom:-100px;left:-100px;animation-delay:5s;}
+@keyframes ob{0%,100%{transform:translate(0,0)}50%{transform:translate(15px,25px)}}
+
+.page{display:none;min-height:100vh;position:relative;z-index:1;}
+#aP{align-items:center;justify-content:center;padding:20px;}
+#aP.active{display:flex;flex-direction:column;}
+#dP.active,#sP.active{display:flex;}
+
+/* AUTH */
+.aLogo{text-align:center;margin-bottom:32px;}
+.lM{font-family:'Orbitron',monospace;font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,var(--c),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 25px rgba(0,245,255,.5));animation:lp 3s ease-in-out infinite;letter-spacing:.1em;}
+@keyframes lp{0%,100%{filter:drop-shadow(0 0 20px rgba(0,245,255,.5))}50%{filter:drop-shadow(0 0 40px rgba(191,0,255,.7))}}
+.lS{font-size:.85rem;letter-spacing:.3em;color:rgba(0,245,255,.45);text-transform:uppercase;margin-top:4px;}
+.aBox{background:var(--pn);border:1px solid rgba(0,245,255,.12);border-radius:20px;width:100%;max-width:420px;padding:36px;box-shadow:0 0 60px rgba(0,245,255,.06);position:relative;}
+.aBox::before{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(0,245,255,.25),transparent 50%,rgba(191,0,255,.25));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;}
+.aTabs{display:flex;border-bottom:1px solid rgba(0,245,255,.1);margin-bottom:28px;}
+.aTab{flex:1;padding:12px;text-align:center;font-size:.95rem;font-weight:700;color:rgba(0,245,255,.35);border-bottom:2px solid transparent;cursor:pointer;transition:all .3s;}
+.aTab.active{color:var(--c);border-bottom-color:var(--c);}
+.aTab:hover:not(.active){color:rgba(0,245,255,.65);}
+.aF{display:none;}.aF.active{display:block;}
+.fL{display:block;color:rgba(0,245,255,.55);font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px;}
+.fI{width:100%;background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.15);border-radius:10px;padding:13px 16px;color:#e0f7ff;font-family:'Tajawal',sans-serif;font-size:.95rem;outline:none;transition:all .3s;direction:rtl;}
+.fI:focus{border-color:var(--c);box-shadow:0 0 20px rgba(0,245,255,.18);background:rgba(0,245,255,.06);}
+.fI::placeholder{color:rgba(0,245,255,.25);}
+.fG{margin-bottom:18px;}
+.bA{width:100%;padding:14px;background:linear-gradient(135deg,rgba(0,245,255,.12),rgba(191,0,255,.12));border:1px solid rgba(0,245,255,.4);border-radius:10px;color:var(--c);font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:800;cursor:pointer;transition:all .3s;margin-top:8px;}
+.bA:hover{box-shadow:0 0 35px rgba(0,245,255,.35);transform:translateY(-1px);}
+.bA:disabled{opacity:.45;cursor:not-allowed;transform:none;}
+
+/* LAYOUT */
+.sb{width:250px;min-height:100vh;background:var(--pn);border-left:1px solid rgba(0,245,255,.1);display:flex;flex-direction:column;position:fixed;top:0;right:0;z-index:100;transition:transform .3s;}
+.sLogo{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;background:linear-gradient(135deg,var(--c),var(--p));-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 8px rgba(0,245,255,.4));}
+.sSub{font-size:.65rem;letter-spacing:.2em;color:rgba(0,245,255,.35);text-transform:uppercase;margin-top:3px;}
+.nB{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;color:rgba(0,245,255,.45);font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:4px;border:none;background:none;width:100%;text-align:right;font-family:'Tajawal',sans-serif;}
+.nB:hover,.nB.active{color:var(--c);background:rgba(0,245,255,.07);box-shadow:inset -3px 0 0 var(--c);}
+.nB svg{width:18px;height:18px;flex-shrink:0;}
+.uAv{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--c),var(--p));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;color:#000;flex-shrink:0;}
+.uN{font-weight:700;font-size:.9rem;color:#e0f7ff;}
+.uE{font-size:.7rem;color:rgba(0,245,255,.35);margin-top:1px;}
+.mc{flex:1;margin-right:250px;min-height:100vh;display:flex;flex-direction:column;}
+.tb{background:rgba(10,13,26,.92);border-bottom:1px solid rgba(0,245,255,.08);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);position:sticky;top:0;z-index:50;}
+.tT{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--c);letter-spacing:.08em;}
+.sCh{background:rgba(0,245,255,.05);border:1px solid rgba(0,245,255,.12);border-radius:6px;padding:6px 14px;font-size:.8rem;color:rgba(0,245,255,.6);font-weight:600;}
+.sCh strong{color:var(--c);}
+.dC{padding:28px;flex:1;}
+
+/* STAT CARDS */
+.sG{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:32px;}
+.sC{background:var(--cd);border:1px solid rgba(0,245,255,.1);border-radius:14px;padding:20px;position:relative;overflow:hidden;}
+.sC::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,255,.3),transparent);}
+.sLb{font-size:.72rem;color:rgba(0,245,255,.45);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;}
+.sV{font-family:'Orbitron',monospace;font-size:2rem;font-weight:900;}
+.sD{font-size:.72rem;margin-top:4px;opacity:.4;}
+.sH{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.sST{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;color:var(--c);letter-spacing:.08em;}
+.sSB{font-size:.8rem;color:rgba(0,245,255,.4);margin-top:2px;}
+.svG{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}
+
+/* SERVER CARD */
+.svC{background:var(--cd);border:1px solid rgba(0,245,255,.1);border-radius:14px;overflow:hidden;transition:all .3s;position:relative;}
+.svC::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,255,.2),transparent);}
+.svC:hover{border-color:rgba(0,245,255,.25);transform:translateY(-3px);}
+.svC.running{border-color:rgba(0,255,136,.35);}
+.svC.running::before{background:linear-gradient(90deg,transparent,rgba(0,255,136,.4),transparent);}
+.svC.error{border-color:rgba(255,51,102,.35);}
+.cH{padding:18px 18px 14px;border-bottom:1px solid rgba(0,245,255,.06);display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.cN{font-size:1rem;font-weight:800;color:#e0f7ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px;}
+.cF{font-size:.75rem;color:rgba(0,245,255,.4);margin-top:4px;}
+.stBg{padding:4px 10px;border-radius:5px;font-size:.68rem;font-weight:800;letter-spacing:.08em;white-space:nowrap;flex-shrink:0;}
+.bgR{background:rgba(0,255,136,.1);color:var(--g);border:1px solid rgba(0,255,136,.3);}
+.bgS{background:rgba(0,245,255,.05);color:rgba(0,245,255,.5);border:1px solid rgba(0,245,255,.15);}
+.bgE{background:rgba(255,51,102,.1);color:var(--r);border:1px solid rgba(255,51,102,.3);}
+.stD{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:6px;}
+.dR{background:var(--g);box-shadow:0 0 8px var(--g);animation:dp 2s infinite;}
+.dS{background:rgba(0,245,255,.3);}
+.dE{background:var(--r);box-shadow:0 0 8px var(--r);}
+@keyframes dp{0%,100%{box-shadow:0 0 4px var(--g)}50%{box-shadow:0 0 16px var(--g),0 0 30px rgba(0,255,136,.3)}}
+.cR{padding:12px 18px;border-bottom:1px solid rgba(0,245,255,.05);display:flex;gap:16px;}
+.rI{font-size:.72rem;color:rgba(0,245,255,.4);}
+.rI strong{color:rgba(0,245,255,.7);}
+.cA{padding:14px 18px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+/* EMPTY SLOT */
+.eS{background:rgba(0,245,255,.02);border:2px dashed rgba(0,245,255,.1);border-radius:14px;min-height:175px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;}
+.eS:hover{border-color:rgba(0,245,255,.3);background:rgba(0,245,255,.05);box-shadow:0 0 25px rgba(0,245,255,.08);}
+.pW{display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(0,245,255,.3);transition:color .3s;}
+.eS:hover .pW{color:var(--c);}
+.pW span{font-size:.85rem;font-weight:700;}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:.85rem;font-weight:700;border:1px solid;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none;}
+.bC{color:var(--c);border-color:rgba(0,245,255,.4);background:rgba(0,245,255,.06);}
+.bC:hover{background:rgba(0,245,255,.15);box-shadow:0 0 18px rgba(0,245,255,.3);}
+.bG{color:var(--g);border-color:rgba(0,255,136,.4);background:rgba(0,255,136,.06);}
+.bG:hover{background:rgba(0,255,136,.15);box-shadow:0 0 18px rgba(0,255,136,.3);}
+.bR{color:var(--r);border-color:rgba(255,51,102,.4);background:rgba(255,51,102,.06);}
+.bR:hover{background:rgba(255,51,102,.15);box-shadow:0 0 18px rgba(255,51,102,.3);}
+.bSm{padding:5px 12px;font-size:.78rem;}
+
+/* TERMINAL */
+.twrap{border:1px solid rgba(0,245,255,.1);border-radius:14px;overflow:hidden;margin-bottom:20px;}
+.tBar{background:#0a0d1a;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(0,245,255,.1);}
+.tDs{display:flex;gap:7px;}
+.td2{width:12px;height:12px;border-radius:50%;}
+.tr{background:#ff5f57;}.ty{background:#febc2e;}.tg{background:#28c840;}
+.tTl{font-family:'Share Tech Mono',monospace;font-size:.78rem;color:rgba(0,245,255,.5);}
+.lBg{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--g);animation:dp 2s infinite;display:none;}
+#term{background:#030408;font-family:'Share Tech Mono',monospace;font-size:.82rem;color:#00f5ff;height:380px;overflow-y:auto;padding:16px;line-height:1.7;white-space:pre-wrap;word-break:break-all;scrollbar-width:thin;scrollbar-color:rgba(0,245,255,.2) transparent;}
+#term::-webkit-scrollbar{width:4px;}
+#term::-webkit-scrollbar-thumb{background:rgba(0,245,255,.2);border-radius:2px;}
+.lSy{color:rgba(0,245,255,.6);}
+.lEr{color:var(--r);}
+.lWa{color:var(--y);}
+.lOk{color:var(--g);}
+.lPy{color:rgba(191,0,255,.85);}
+
+/* FILE MANAGER */
+.fCard{background:var(--cd);border:1px solid rgba(0,245,255,.1);border-radius:14px;overflow:hidden;}
+.fCH{padding:16px 18px;border-bottom:1px solid rgba(0,245,255,.08);display:flex;align-items:center;justify-content:space-between;}
+.fCT{font-size:.85rem;font-weight:800;color:var(--c);letter-spacing:.08em;text-transform:uppercase;}
+#dz{margin:14px;border:2px dashed rgba(0,245,255,.18);border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;transition:all .3s;position:relative;}
+#dz:hover,#dz.drag{border-color:var(--c);background:rgba(0,245,255,.05);box-shadow:0 0 20px rgba(0,245,255,.1);}
+#dz input{position:absolute;inset:0;opacity:0;cursor:pointer;}
+.dzT{font-size:.82rem;color:rgba(0,245,255,.5);}
+.dzH{font-size:.68rem;color:rgba(0,245,255,.3);margin-top:3px;font-family:'Share Tech Mono',monospace;}
+.fList{max-height:300px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(0,245,255,.15) transparent;}
+.fRow{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid rgba(0,245,255,.05);transition:background .2s;}
+.fRow:last-child{border-bottom:none;}
+.fRow:hover{background:rgba(0,245,255,.04);}
+.fNm{font-family:'Share Tech Mono',monospace;font-size:.8rem;color:#e0f7ff;}
+.fSz{font-size:.68rem;color:rgba(0,245,255,.35);margin-top:2px;}
+
+/* MODAL */
+.mBg{position:fixed;inset:0;background:rgba(6,8,16,.88);backdrop-filter:blur(8px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.mBg.open{display:flex;}
+.mBox{background:var(--pn);border:1px solid rgba(0,245,255,.2);border-radius:18px;width:100%;max-width:420px;box-shadow:0 0 60px rgba(0,245,255,.1);}
+.mH{padding:20px 24px;border-bottom:1px solid rgba(0,245,255,.08);display:flex;align-items:center;justify-content:space-between;}
+.mT{font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;color:var(--c);letter-spacing:.08em;}
+.mX{background:none;border:none;color:rgba(0,245,255,.4);font-size:1.5rem;cursor:pointer;line-height:1;transition:color .2s;}
+.mX:hover{color:var(--c);}
+.mB{padding:24px;}
+.mF{padding:16px 24px;border-top:1px solid rgba(0,245,255,.08);display:flex;gap:10px;justify-content:flex-end;}
+.inp{width:100%;background:rgba(0,245,255,.03);border:1px solid rgba(0,245,255,.15);border-radius:10px;padding:12px 14px;color:#e0f7ff;font-family:'Tajawal',sans-serif;font-size:.9rem;outline:none;transition:all .3s;direction:rtl;}
+.inp:focus{border-color:var(--c);box-shadow:0 0 15px rgba(0,245,255,.15);background:rgba(0,245,255,.05);}
+.inp::placeholder{color:rgba(0,245,255,.25);}
+.iG{margin-bottom:18px;}
+.iL{display:block;margin-bottom:7px;color:rgba(0,245,255,.55);font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+
+/* TOASTS */
+#ts{position:fixed;top:18px;left:18px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+.tst{padding:13px 18px;border-radius:10px;font-size:.88rem;font-weight:600;min-width:260px;max-width:360px;border-right:3px solid;transform:translateX(-120%);transition:transform .4s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;gap:10px;}
+.tst.show{transform:translateX(0);}
+.ts{background:#071a12;border-color:var(--g);color:var(--g);box-shadow:0 0 20px rgba(0,255,136,.2);}
+.te{background:#1a0709;border-color:var(--r);color:var(--r);box-shadow:0 0 20px rgba(255,51,102,.2);}
+.ti{background:#071218;border-color:var(--c);color:var(--c);box-shadow:0 0 20px rgba(0,245,255,.2);}
+.tw{background:#1a1500;border-color:var(--y);color:var(--y);box-shadow:0 0 20px rgba(255,204,0,.2);}
+
+/* FOOTER */
+.nF{text-align:center;padding:22px;font-family:'Share Tech Mono',monospace;font-size:.75rem;letter-spacing:.1em;animation:fg 4s ease-in-out infinite;}
+@keyframes fg{0%,100%{color:rgba(0,245,255,.35);text-shadow:none}50%{color:rgba(0,245,255,.9);text-shadow:0 0 15px rgba(0,245,255,.5),0 0 35px rgba(191,0,255,.35)}}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sb{transform:translateX(100%);}
+  .sb.open{transform:translateX(0);}
+  .mc{margin-right:0;}
+  .mB2{display:flex !important;}
+  .sG,.sdG{grid-template-columns:repeat(2,1fr)!important;}
+  .sdG2{grid-template-columns:1fr!important;}
+}
+.mB2{display:none;background:none;border:none;color:var(--c);cursor:pointer;padding:4px;}
+</style>
+</head>
+<body>
+<div class="scan"></div>
+<div class="orb o1"></div>
+<div class="orb o2"></div>
+<div id="ts"></div>
+
+<!-- ═══════════════ AUTH ═══════════════ -->
+<div id="aP" class="page active">
+  <div class="aLogo">
+    <div class="lM">ALORD</div>
+    <div class="lS">منصة الاستضافة السحابية</div>
+  </div>
+  <div class="aBox">
+    <div class="aTabs">
+      <div class="aTab active" onclick="swTab('login')">تسجيل الدخول</div>
+      <div class="aTab" onclick="swTab('reg')">حساب جديد</div>
+    </div>
+    <div id="lF" class="aF active">
+      <div class="fG"><label class="fL">اسم المستخدم</label><input id="lU" type="text" class="fI" placeholder="أدخل اسم المستخدم"></div>
+      <div class="fG"><label class="fL">كلمة المرور</label><input id="lP" type="password" class="fI" placeholder="••••••••"></div>
+      <button class="bA" onclick="doLogin()">دخول للمنصة</button>
+    </div>
+    <div id="rF" class="aF">
+      <div class="fG"><label class="fL">اسم المستخدم</label><input id="rU" type="text" class="fI" placeholder="اختر اسم مستخدم"></div>
+      <div class="fG"><label class="fL">البريد الإلكتروني</label><input id="rE" type="email" class="fI" placeholder="example@email.com"></div>
+      <div class="fG"><label class="fL">كلمة المرور</label><input id="rP" type="password" class="fI" placeholder="8 أحرف على الأقل"></div>
+      <button class="bA" onclick="doReg()">إنشاء الحساب</button>
+    </div>
+  </div>
+  <div class="nF" style="margin-top:24px;">Developed by 『 | 𝘼𝙡𝙤𝙧𝙙 𝙕𝙖𝙮𝙧𝙤 🖤 | 』</div>
+</div>
+
+<!-- ═══════════════ DASHBOARD ═══════════════ -->
+<div id="dP" class="page">
+  <nav class="sb" id="sb1">
+    <div style="padding:24px 20px;border-bottom:1px solid rgba(0,245,255,.08);">
+      <div class="sLogo">ALORD</div><div class="sSub">HOSTING PLATFORM</div>
+    </div>
+    <div style="flex:1;padding:16px 12px;">
+      <button class="nB active" onclick="goDash()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        لوحة التحكم
+      </button>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid rgba(0,245,255,.08);display:flex;align-items:center;gap:12px;">
+      <div class="uAv" id="av1">A</div>
+      <div><div class="uN" id="un1">مستخدم</div><div class="uE" id="ue1"></div></div>
+    </div>
+    <div style="padding:0 16px 16px;">
+      <button class="nB" style="color:var(--r);" onclick="doOut()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/></svg>
+        تسجيل الخروج
+      </button>
+    </div>
+  </nav>
+  <div class="mc">
+    <div class="tb">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="mB2" id="mb1" onclick="document.getElementById('sb1').classList.toggle('open')">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div class="tT">لوحة التحكم</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div class="sCh">السيرفرات: <strong id="tC">0</strong>/7</div>
+        <div class="sCh">يعمل: <strong id="tR">0</strong></div>
+      </div>
+    </div>
+    <div class="dC">
+      <div class="sG">
+        <div class="sC"><div class="sLb">إجمالي السيرفرات</div><div class="sV" id="stT" style="color:var(--c);">0</div><div class="sD">من أصل 7</div></div>
+        <div class="sC" style="border-color:rgba(0,255,136,.15);"><div class="sLb" style="color:rgba(0,255,136,.5);">يعمل الآن</div><div class="sV" id="stR" style="color:var(--g);">0</div><div class="sD" style="color:rgba(0,255,136,.3);">متصل</div></div>
+        <div class="sC"><div class="sLb" style="color:rgba(191,0,255,.5);">حد المعالج</div><div class="sV" style="color:var(--p);">0.5</div><div class="sD" style="color:rgba(191,0,255,.3);">كور/سيرفر</div></div>
+        <div class="sC"><div class="sLb" style="color:rgba(255,204,0,.5);">حد الذاكرة</div><div class="sV" style="color:var(--y);">256</div><div class="sD" style="color:rgba(255,204,0,.3);">MB/سيرفر</div></div>
+      </div>
+      <div class="sH">
+        <div><div class="sST">سيرفراتي</div><div class="sSB">إدارة بيئات Python المعزولة</div></div>
+        <button class="btn bC" onclick="openCM()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+          سيرفر جديد
+        </button>
+      </div>
+      <div class="svG" id="svG"></div>
+    </div>
+    <div class="nF">Developed by 『 | 𝘼𝙡𝙤𝙧𝙙 𝙕𝙖𝙮𝙧𝙤 🖤 | 』</div>
+  </div>
+</div>
+
+<!-- ═══════════════ SERVER PAGE ═══════════════ -->
+<div id="sP" class="page">
+  <nav class="sb" id="sb2">
+    <div style="padding:24px 20px;border-bottom:1px solid rgba(0,245,255,.08);">
+      <div class="sLogo">ALORD</div><div class="sSub">HOSTING PLATFORM</div>
+    </div>
+    <div style="flex:1;padding:16px 12px;">
+      <button class="nB" onclick="goDash()">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        العودة للوحة
+      </button>
+    </div>
+    <div style="padding:16px 20px;border-top:1px solid rgba(0,245,255,.08);display:flex;align-items:center;gap:12px;">
+      <div class="uAv" id="av2">A</div>
+      <div><div class="uN" id="un2">مستخدم</div></div>
+    </div>
+  </nav>
+  <div class="mc">
+    <div class="tb">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <button class="mB2" id="mb2" onclick="document.getElementById('sb2').classList.toggle('open')">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <button onclick="goDash()" style="background:none;border:none;color:rgba(0,245,255,.5);cursor:pointer;font-size:.85rem;font-family:'Tajawal',sans-serif;" onmouseover="this.style.color='var(--c)'" onmouseout="this.style.color='rgba(0,245,255,.5)'">← لوحة التحكم</button>
+        <span style="color:rgba(0,245,255,.2);">/</span>
+        <span id="spN" style="font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;color:var(--c);"></span>
+        <span id="spBg" class="stBg bgS"></span>
+      </div>
+      <div id="spAc" style="display:flex;gap:8px;"></div>
+    </div>
+    <div class="dC">
+      <div class="sdG" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:14px;margin-bottom:24px;">
+        <div class="sC" style="padding:16px;"><div class="sLb">الملفات المرفوعة</div><div id="spFC" style="font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:var(--c);margin-top:6px;">0</div></div>
+        <div class="sC" style="padding:16px;"><div class="sLb" style="color:rgba(191,0,255,.5);">حد المعالج</div><div style="font-family:'Orbitron',monospace;font-size:.9rem;color:var(--p);margin-top:6px;">0.5 كور</div></div>
+        <div class="sC" style="padding:16px;"><div class="sLb" style="color:rgba(255,204,0,.5);">حد الذاكرة</div><div style="font-family:'Orbitron',monospace;font-size:.9rem;color:var(--y);margin-top:6px;">256 MB</div></div>
+        <div class="sC" style="padding:16px;"><div class="sLb">تاريخ الإنشاء</div><div id="spCr" style="font-family:'Share Tech Mono',monospace;font-size:.8rem;color:#e0f7ff;margin-top:6px;"></div></div>
+      </div>
+      <div class="sdG2" style="display:grid;grid-template-columns:1fr 340px;gap:20px;align-items:start;">
+        <!-- تيرمنال -->
+        <div>
+          <div class="twrap">
+            <div class="tBar">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div class="tDs"><div class="td2 tr"></div><div class="td2 ty"></div><div class="td2 tg"></div></div>
+                <span class="tTl" id="tTl">terminal</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span id="lBg" class="lBg">● مباشر</span>
+                <button class="btn bC bSm" onclick="clrTerm()">مسح</button>
+                <button class="btn bC bSm" onclick="document.getElementById('term').scrollTop=99999">↓</button>
+              </div>
+            </div>
+            <div id="term"><span class="lSy">[النظام] جاهز — ارفع ملفاتك ثم اضغط تشغيل.</span>
+</div>
+          </div>
+          <div class="sC" style="padding:20px;">
+            <div style="font-size:.85rem;font-weight:800;color:var(--c);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">إعادة تسمية السيرفر</div>
+            <div style="display:flex;gap:10px;">
+              <input id="rnInp" type="text" class="inp" placeholder="اسم السيرفر" style="flex:1;">
+              <button class="btn bC" onclick="rnSrv()">حفظ</button>
+            </div>
+          </div>
+        </div>
+        <!-- ملفات -->
+        <div class="fCard">
+          <div class="fCH">
+            <div class="fCT">مدير الملفات</div>
+            <span id="fCBg" style="font-size:.72rem;color:rgba(0,245,255,.4);font-family:'Share Tech Mono',monospace;">0 ملف</span>
+          </div>
+          <div id="dz">
+            <input type="file" id="fIn" multiple accept=".py,.txt,.json,.env,.cfg,.ini,.yaml,.yml" onchange="upFiles(this.files)">
+            <div style="color:rgba(0,245,255,.4);margin-bottom:6px;">
+              <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" style="margin:0 auto;display:block;"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            </div>
+            <div class="dzT">اسحب ملفاتك هنا أو اضغط للرفع</div>
+            <div class="dzH">.py .txt .json .env .yaml .cfg</div>
+          </div>
+          <div class="fList" id="fList">
+            <div id="fEm" style="padding:20px;text-align:center;font-size:.8rem;color:rgba(0,245,255,.3);">لا توجد ملفات بعد</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="nF">Developed by 『 | 𝘼𝙡𝙤𝙧𝙙 𝙕𝙖𝙮𝙧𝙤 🖤 | 』</div>
+  </div>
+</div>
+
+<!-- مودال إنشاء سيرفر -->
+<div class="mBg" id="cM">
+  <div class="mBox">
+    <div class="mH"><span class="mT">سيرفر جديد</span><button class="mX" onclick="clsM('cM')">×</button></div>
+    <div class="mB">
+      <div class="iG"><label class="iL">اسم السيرفر</label><input id="nN" type="text" class="inp" placeholder="مثال: بوت ديسكورد، أداة تحميل..." maxlength="60"></div>
+      <div style="background:rgba(0,245,255,.04);border:1px solid rgba(0,245,255,.12);border-radius:10px;padding:14px;font-size:.82rem;color:rgba(0,245,255,.55);line-height:1.8;">
+        💡 بعد الإنشاء، ارفع ملفاتك وسيقوم السيرفر بتشغيل <strong style="color:var(--c);">كل ملفات .py</strong> تلقائياً.<br>
+        إذا وجد <strong style="color:var(--c);">requirements.txt</strong> يتم تثبيت المكتبات أولاً.
+      </div>
+    </div>
+    <div class="mF">
+      <button class="btn bR" onclick="clsM('cM')">إلغاء</button>
+      <button class="btn bC" onclick="crSrv()">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        إنشاء السيرفر
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- مودال عرض ملف -->
+<div class="mBg" id="vM">
+  <div class="mBox" style="max-width:780px;">
+    <div class="mH"><span class="mT" id="vMT">عرض الملف</span><button class="mX" onclick="clsM('vM')">×</button></div>
+    <div class="mB" style="padding:16px;">
+      <pre id="fV" style="max-height:60vh;overflow-y:auto;background:#030408;border-radius:10px;padding:16px;font-family:'Share Tech Mono',monospace;font-size:.8rem;color:#c8e8f0;white-space:pre-wrap;word-break:break-all;scrollbar-width:thin;"></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════
+//  DB
+// ════════════════════════════════════
+const DB={
+  g:k=>{try{return JSON.parse(localStorage.getItem(k));}catch{return null;}},
+  s:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+  d:k=>localStorage.removeItem(k)
+};
+const gUs=()=>DB.g('au')||{};
+const sUs=u=>DB.s('au',u);
+const gSs=()=>DB.g('as');
+const sSs=s=>DB.s('as',s);
+const cSs=()=>DB.d('as');
+const gSv=u=>DB.g('sv_'+u)||[];
+const sSv=(u,l)=>DB.s('sv_'+u,l);
+const gLg=s=>DB.g('lg_'+s)||[];
+const sLg=(s,l)=>DB.s('lg_'+s,l.slice(-500));
+const aLg=(s,ln)=>{const l=gLg(s);l.push('['+new Date().toLocaleTimeString('ar')+'] '+ln);sLg(s,l);};
+const gFl=s=>DB.g('fl_'+s)||[];
+const sFl=(s,f)=>DB.s('fl_'+s,f);
+
+// ════════════════════════════════════
+//  Toast
+// ════════════════════════════════════
+function toast(m,t='i'){
+  const c=document.getElementById('ts');
+  const el=document.createElement('div');
+  el.className='tst t'+t;
+  el.textContent=({s:'✓ ',e:'✗ ',i:'ℹ ',w:'⚠ '}[t]||'')+m;
+  c.appendChild(el);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.add('show')));
+  setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),500);},3500);
+}
+
+// ════════════════════════════════════
+//  Pages
+// ════════════════════════════════════
+function sp(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function goDash(){sp('dP');rdDash();}
+
+// ════════════════════════════════════
+//  Modal
+// ════════════════════════════════════
+function opM(id){document.getElementById(id).classList.add('open');}
+function clsM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mBg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.mBg.open').forEach(m=>m.classList.remove('open'));
+  if(e.key==='Enter'&&document.getElementById('cM').classList.contains('open'))crSrv();
+});
+
+// ════════════════════════════════════
+//  Responsive
+// ════════════════════════════════════
+function chkR(){
+  const mob=window.innerWidth<=768;
+  document.getElementById('mb1').style.display=mob?'flex':'none';
+  document.getElementById('mb2').style.display=mob?'flex':'none';
+}
+window.addEventListener('resize',chkR);chkR();
+
+// ════════════════════════════════════
+//  Tabs
+// ════════════════════════════════════
+function swTab(t){
+  document.querySelectorAll('.aTab').forEach((el,i)=>el.classList.toggle('active',(t==='login'&&i===0)||(t==='reg'&&i===1)));
+  document.getElementById('lF').classList.toggle('active',t==='login');
+  document.getElementById('rF').classList.toggle('active',t==='reg');
+}
+
+// ════════════════════════════════════
+//  Hash
+// ════════════════════════════════════
+function hp(p){let h=0;for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0;}return 'h'+Math.abs(h).toString(36)+'_'+p.length;}
+
+// ════════════════════════════════════
+//  Login
+// ════════════════════════════════════
+function doLogin(){
+  const u=document.getElementById('lU').value.trim();
+  const p=document.getElementById('lP').value;
+  if(!u||!p)return toast('يرجى ملء جميع الحقول','e');
+  const us=gUs();
+  if(!us[u])return toast('اسم المستخدم غير موجود','e');
+  if(us[u].pw!==hp(p))return toast('كلمة المرور خاطئة','e');
+  sSs({u,e:us[u].e});
+  toast('مرحباً '+u+' 🖤','s');
+  setTimeout(()=>{sp('dP');rdDash();},600);
+}
+
+// ════════════════════════════════════
+//  Register
+// ════════════════════════════════════
+function doReg(){
+  const u=document.getElementById('rU').value.trim();
+  const e=document.getElementById('rE').value.trim();
+  const p=document.getElementById('rP').value;
+  if(!u||!e||!p)return toast('يرجى ملء جميع الحقول','e');
+  if(p.length<8)return toast('كلمة المرور 8 أحرف على الأقل','e');
+  if(!/\S+@\S+\.\S+/.test(e))return toast('البريد الإلكتروني غير صحيح','e');
+  const us=gUs();
+  if(us[u])return toast('اسم المستخدم مأخوذ','e');
+  us[u]={e,pw:hp(p)};sUs(us);
+  sSs({u,e});
+  toast('تم إنشاء الحساب! 🖤','s');
+  setTimeout(()=>{sp('dP');rdDash();},600);
+}
+
+// ════════════════════════════════════
+//  Logout
+// ════════════════════════════════════
+function doOut(){cSs();sp('aP');toast('تم تسجيل الخروج','i');}
+
+// ════════════════════════════════════
+//  Render Dashboard
+// ════════════════════════════════════
+function stAr(s){return{running:'يعمل',stopped:'متوقف',error:'خطأ'}[s]||s;}
+
+function rdDash(){
+  const ss=gSs();if(!ss)return;
+  document.getElementById('av1').textContent=ss.u[0].toUpperCase();
+  document.getElementById('un1').textContent=ss.u;
+  document.getElementById('ue1').textContent=ss.e;
+  const svs=gSv(ss.u);
+  const run=svs.filter(s=>s.status==='running').length;
+  document.getElementById('stT').textContent=svs.length;
+  document.getElementById('stR').textContent=run;
+  document.getElementById('tC').textContent=svs.length;
+  document.getElementById('tR').textContent=run;
+  const g=document.getElementById('svG');g.innerHTML='';
+  svs.forEach(sv=>{
+    const fls=gFl(sv.id);
+    const pyF=fls.filter(f=>f.name.endsWith('.py'));
+    const el=document.createElement('div');
+    el.className='svC '+sv.status;
+    el.id='c_'+sv.id;
+    el.innerHTML=`
+    <div class="cH">
+      <div style="min-width:0;">
+        <div class="cN">${sv.name}</div>
+        <div class="cF">
+          <span class="stD d${sv.status[0]}"></span>
+          ${fls.length} ملف${fls.length!==1?'ات':''}
+          ${pyF.length>0?'· 🐍 '+pyF.length+' سكربت':'· <span style="color:var(--y);">⚠ ارفع ملف .py</span>'}
+        </div>
+      </div>
+      <span class="stBg bg${sv.status[0].toUpperCase()}">${stAr(sv.status)}</span>
+    </div>
+    <div class="cR">
+      <div class="rI">🧠 RAM: <strong>256 MB</strong></div>
+      <div class="rI">⚡ CPU: <strong>0.5 كور</strong></div>
+    </div>
+    <div class="cA">
+      ${sv.status!=='running'
+        ?`<button class="btn bG bSm" onclick="stSv('${sv.id}')">▶ تشغيل</button>`
+        :`<button class="btn bR bSm" onclick="spSv('${sv.id}')">■ إيقاف</button>`}
+      <button class="btn bC bSm" onclick="opSrv('${sv.id}')">⚙ إدارة</button>
+      <button class="btn bR bSm" onclick="dlSv('${sv.id}')" style="margin-right:auto;">🗑</button>
+    </div>`;
+    g.appendChild(el);
+  });
+  // empty slots
+  for(let i=0;i<7-svs.length;i++){
+    const el=document.createElement('div');
+    el.className='eS';el.onclick=openCM;
+    el.innerHTML=`<div class="pW"><svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span>سيرفر جديد</span></div>`;
+    g.appendChild(el);
+  }
+}
+
+// ════════════════════════════════════
+//  Create Server
+// ════════════════════════════════════
+function openCM(){
+  const ss=gSs();if(!ss)return;
+  if(gSv(ss.u).length>=7)return toast('الحد الأقصى 7 سيرفرات','w');
+  document.getElementById('nN').value='';
+  opM('cM');
+  setTimeout(()=>document.getElementById('nN').focus(),100);
+}
+
+function crSrv(){
+  const ss=gSs();if(!ss)return;
+  const name=document.getElementById('nN').value.trim()||'سيرفر جديد';
+  const svs=gSv(ss.u);
+  if(svs.length>=7)return toast('الحد الأقصى 7 سيرفرات','w');
+  const sv={id:'s'+Date.now(),name,status:'stopped',created:new Date().toLocaleDateString('ar-EG')};
+  svs.push(sv);sSv(ss.u,svs);
+  clsM('cM');
+  toast('تم إنشاء "'+name+'" ✓','s');
+  rdDash();
+}
+
+// ════════════════════════════════════
+//  Start Server — يشغل كل ملفات .py
+// ════════════════════════════════════
+function stSv(id){
+  const ss=gSs();if(!ss)return;
+  const svs=gSv(ss.u);
+  const sv=svs.find(s=>s.id===id);if(!sv)return;
+
+  const fls=gFl(id);
+  const pyF=fls.filter(f=>f.name.endsWith('.py'));
+  const hasReq=fls.some(f=>f.name==='requirements.txt');
+
+  sv.status='running';
+  sv.lastStart=new Date().toLocaleTimeString('ar');
+  sSv(ss.u,svs);
+
+  // بناء اللوجات
+  const now=()=>new Date().toLocaleTimeString('ar');
+  const logs=[];
+  logs.push(`[${now()}] [النظام] 🚀 جاري تشغيل السيرفر "${sv.name}"...`);
+
+  if(fls.length===0){
+    logs.push(`[${now()}] [تحذير] ⚠ لا توجد ملفات — اضغط "إدارة" وارفع ملفاتك`);
+    logs.push(`[${now()}] [النظام] السيرفر يعمل وينتظر الملفات...`);
+  } else {
+    if(hasReq){
+      logs.push(`[${now()}] [النظام] 📦 تم اكتشاف requirements.txt`);
+      logs.push(`[${now()}] [pip] Collecting packages...`);
+      // محاكاة تثبيت المكتبات من requirements.txt
+      const req=fls.find(f=>f.name==='requirements.txt');
+      if(req&&req.content){
+        req.content.split('\n').filter(l=>l.trim()&&!l.startsWith('#')).forEach(lib=>{
+          logs.push(`[${now()}] [pip] Installing ${lib.trim()}...`);
+        });
+      }
+      logs.push(`[${now()}] [pip] ✅ Successfully installed all packages`);
+    }
+
+    if(pyF.length>0){
+      pyF.forEach(f=>{
+        logs.push(`[${now()}] [Python] ▶ python -u ${f.name}`);
+        // عرض محتوى الكود في التيرمنال
+        if(f.content){
+          const lines=f.content.split('\n').slice(0,5);
+          lines.forEach(line=>{if(line.trim())logs.push(`[${now()}] [output] ${line}`);});
+          if(f.content.split('\n').length>5) logs.push(`[${now()}] [output] ... (يعمل)`);
+        }
+        logs.push(`[${now()}] [النظام] ✅ ${f.name} — يعمل`);
+      });
+    } else {
+      logs.push(`[${now()}] [تحذير] ⚠ لا يوجد ملف .py — ارفع ملف السكربت`);
+    }
+    // الملفات الأخرى
+    fls.filter(f=>!f.name.endsWith('.py')&&f.name!=='requirements.txt').forEach(f=>{
+      logs.push(`[${now()}] [النظام] 📄 ملف محمّل: ${f.name}`);
+    });
+  }
+  logs.push(`[${now()}] [النظام] ══════════════════════════`);
+  logs.push(`[${now()}] [النظام] ✅ السيرفر "${sv.name}" يعمل`);
+  sLg(id,logs);
+
+  toast('تم تشغيل "'+sv.name+'" ✓','s');
+  rdDash();
+  // تحديث صفحة السيرفر لو مفتوحة
+  if(document.getElementById('sP').classList.contains('active')&&window._cId===id)opSrv(id);
+}
+
+// ════════════════════════════════════
+//  Stop Server
+// ════════════════════════════════════
+function spSv(id){
+  const ss=gSs();if(!ss)return;
+  const svs=gSv(ss.u);
+  const sv=svs.find(s=>s.id===id);if(!sv)return;
+  sv.status='stopped';sSv(ss.u,svs);
+  aLg(id,'[النظام] ■ تم إيقاف السيرفر.');
+  toast('تم إيقاف "'+sv.name+'"','w');
+  rdDash();
+  if(document.getElementById('sP').classList.contains('active')&&window._cId===id)opSrv(id);
+}
+
+// ════════════════════════════════════
+//  Delete Server
+// ════════════════════════════════════
+function dlSv(id){
+  const ss=gSs();if(!ss)return;
+  const svs=gSv(ss.u);
+  const sv=svs.find(s=>s.id===id);if(!sv)return;
+  if(!confirm('حذف "'+sv.name+'"؟ لا يمكن التراجع.'))return;
+  sSv(ss.u,svs.filter(s=>s.id!==id));
+  DB.d('lg_'+id);DB.d('fl_'+id);
+  toast('تم حذف "'+sv.name+'"','s');
+  rdDash();
+}
+
+// ════════════════════════════════════
+//  Open Server Page
+// ════════════════════════════════════
+function opSrv(id){
+  const ss=gSs();if(!ss)return;
+  const sv=gSv(ss.u).find(s=>s.id===id);if(!sv)return;
+  window._cId=id;window._cUid=ss.u;
+
+  document.getElementById('spN').textContent=sv.name;
+  document.getElementById('spBg').textContent=stAr(sv.status);
+  document.getElementById('spBg').className='stBg bg'+sv.status[0].toUpperCase();
+  document.getElementById('spCr').textContent=sv.created;
+  document.getElementById('rnInp').value=sv.name;
+  document.getElementById('tTl').textContent='terminal — '+sv.name;
+  document.getElementById('lBg').style.display=sv.status==='running'?'inline':'none';
+  document.getElementById('av2').textContent=ss.u[0].toUpperCase();
+  document.getElementById('un2').textContent=ss.u;
+
+  const ac=document.getElementById('spAc');
+  ac.innerHTML=sv.status!=='running'
+    ?`<button class="btn bG" onclick="stSv('${id}')">▶ تشغيل</button><button class="btn bR" onclick="if(confirm('حذف؟')){dlSv('${id}');goDash();}">🗑</button>`
+    :`<button class="btn bR" onclick="spSv('${id}')">■ إيقاف</button><button class="btn bR" onclick="if(confirm('حذف؟')){dlSv('${id}');goDash();}">🗑</button>`;
+
+  ldTerm(id);
+  rdFiles(id);
+  sp('sP');
+}
+
+// ════════════════════════════════════
+//  Terminal
+// ════════════════════════════════════
+function ldTerm(id){
+  const t=document.getElementById('term');
+  t.innerHTML='';
+  const logs=gLg(id);
+  if(!logs.length){t.innerHTML='<span class="lSy">[النظام] جاهز — ارفع ملفاتك ثم اضغط تشغيل.</span>\n';return;}
+  logs.forEach(line=>{
+    const span=document.createElement('span');
+    if(line.includes('[تحذير]')||line.includes('⚠'))span.className='lWa';
+    else if(line.includes('[pip]'))span.className='lPy';
+    else if(line.includes('[Python]'))span.className='lOk';
+    else if(line.includes('[output]'))span.style.color='#e0f7ff';
+    else if(line.includes('[النظام]'))span.className='lSy';
+    else if(line.includes('[خطأ]')||line.includes('Error'))span.className='lEr';
+    span.textContent=line+'\n';
+    t.appendChild(span);
+  });
+  t.scrollTop=t.scrollHeight;
+}
+
+function clrTerm(){
+  if(!window._cId)return;
+  sLg(window._cId,[]);
+  document.getElementById('term').innerHTML='<span class="lSy">[النظام] تم مسح السجل.</span>\n';
+  toast('تم مسح السجل','i');
+}
+
+// ════════════════════════════════════
+//  Rename
+// ════════════════════════════════════
+function rnSrv(){
+  const id=window._cId,uid=window._cUid;if(!id||!uid)return;
+  const name=document.getElementById('rnInp').value.trim();
+  if(!name)return toast('الاسم لا يمكن أن يكون فارغاً','e');
+  const svs=gSv(uid);
+  const sv=svs.find(s=>s.id===id);if(!sv)return;
+  sv.name=name;sSv(uid,svs);
+  document.getElementById('spN').textContent=name;
+  document.getElementById('tTl').textContent='terminal — '+name;
+  toast('تم تغيير الاسم ✓','s');
+}
+
+// ════════════════════════════════════
+//  Files
+// ════════════════════════════════════
+const ALLOWED=['py','txt','json','env','cfg','ini','yaml','yml'];
+
+function fmtSz(b){if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB';}
+
+function rdFiles(id){
+  const fls=gFl(id);
+  const list=document.getElementById('fList');
+  const em=document.getElementById('fEm');
+  list.querySelectorAll('.fRow').forEach(r=>r.remove());
+  document.getElementById('fCBg').textContent=fls.length+' ملف';
+  document.getElementById('spFC').textContent=fls.length;
+  if(!fls.length){em.style.display='block';return;}
+  em.style.display='none';
+  fls.forEach(f=>{
+    const row=document.createElement('div');
+    row.className='fRow';
+    const ic=f.name.endsWith('.py')?'🐍':f.name==='requirements.txt'?'📦':'📄';
+    row.innerHTML=`<div><div class="fNm">${ic} ${f.name}</div><div class="fSz">${fmtSz(f.size)}</div></div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn bC bSm" onclick="vwFile('${id}','${f.name}')">عرض</button>
+      <button class="btn bR bSm" onclick="dlFile('${id}','${f.name}')">✕</button>
+    </div>`;
+    list.appendChild(row);
+  });
+}
+
+function upFiles(fl){
+  const id=window._cId;if(!id)return;
+  Array.from(fl).forEach(file=>{
+    const ext=file.name.split('.').pop().toLowerCase();
+    if(!ALLOWED.includes(ext))return toast('النوع "'+ext+'" غير مسموح','e');
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const fls=gFl(id);
+      const idx=fls.findIndex(f=>f.name===file.name);
+      const entry={name:file.name,size:file.size,content:e.target.result};
+      idx>=0?fls[idx]=entry:fls.push(entry);
+      sFl(id,fls);
+      aLg(id,'[النظام] 📁 تم رفع: '+file.name);
+      toast('تم رفع "'+file.name+'" ✓','s');
+      if(document.getElementById('term'))ldTerm(id);
+      rdFiles(id);
+    };
+    reader.readAsText(file);
+  });
+}
+
+function dlFile(id,name){
+  if(!confirm('حذف "'+name+'"؟'))return;
+  sFl(id,gFl(id).filter(f=>f.name!==name));
+  toast('تم حذف "'+name+'"','s');
+  rdFiles(id);
+}
+
+function vwFile(id,name){
+  const f=gFl(id).find(x=>x.name===name);
+  if(!f)return toast('الملف غير موجود','e');
+  document.getElementById('vMT').textContent='📄 '+name;
+  document.getElementById('fV').textContent=f.content||'(الملف فارغ)';
+  opM('vM');
+}
+
+// ════════════════════════════════════
+//  Drag & Drop
+// ════════════════════════════════════
+const dzEl=document.getElementById('dz');
+dzEl.addEventListener('dragover',e=>{e.preventDefault();dzEl.classList.add('drag');});
+dzEl.addEventListener('dragleave',()=>dzEl.classList.remove('drag'));
+dzEl.addEventListener('drop',e=>{e.preventDefault();dzEl.classList.remove('drag');upFiles(e.dataTransfer.files);});
+
+// ════════════════════════════════════
+//  Init
+// ════════════════════════════════════
+(function(){
+  const ss=gSs();
+  if(ss){sp('dP');rdDash();}
+  else sp('aP');
+})();
+</script>
+</body>
+</html>
